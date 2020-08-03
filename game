@@ -1,0 +1,103 @@
+//This is a relaxing game where one can use their mouse to control a turtle and have it eat seaweed. This is created using the collideRectCircle() function in the 2dcollision library of p5js, based on the object oriented collision example here: https://bmoren.github.io/p5.collide2D/examples/objectCollision/index.html. I changed it so that it would follow the theme of a turtle swimming in the sea trying to eat seaweed. I wanted it to be relaxing so did not incorporate a score component. I wanted to incorporate stages (hungry, very hungry, starving) that would affect the numRect variable, but couldn't figure out how to get keyPressed to work for a loop that needs to be in setup. 
+
+//Variables to define objects
+var rects = [];
+var numRects = 100;
+var cir;
+var colorstore;
+
+function setup() {
+  createCanvas(800, 800);
+  
+  
+  //create a loop of rectangle 'seaweed' 
+  for (i = 0; i < numRects; i++) {
+    r = new rectObj(random(width / 1.1), random(height / 1.1), random(10, 10), random(20, 30)) // generate a rectObj
+    rects.push(r); //add it to the array.
+  }
+  
+  cir = new circleObj(70); // create a new circle object with diameter 70 to make the turtle appear to eat the seaweed
+}
+
+
+function draw() {
+  //create blue sea background
+  background("#1A53FF");
+  
+  //collide loop
+  for (i = 0; i < numRects; i++) {
+    rects[i].disp();
+    rects[i].collide(cir); //collide against the circle object
+  }
+  //keep the circle on the mouse location
+  cir.disp(mouseX, mouseY); //pass the x,y pos in to the circle.
+}
+
+
+//defining rectObj function
+function rectObj(x, y, w, h) {
+  this.x = x
+  this.y = y
+  this.w = w
+  this.h = h
+  this.color = color(random(0), random(153), random(0))
+  this.hit = false;
+  this.collide = function(obj) {
+    this.hit = collideRectCircle(this.x, this.y, this.w, this.h, obj.x, obj.y, obj.dia); //collide the cir object into this rectangle object.
+    if (this.hit && this.x < width) {
+      colorstore = this.color
+      this.color = color("#1A53FF") //make rectangles 'disappear'
+    } else if (this.x > (width - this.w)) {
+      this.color = color(random(0), random(153), random(0))
+    }
+  }
+  //what does this mean?
+  this.disp = function() {
+    noStroke();
+    fill(this.color);
+    this.x += 3 //move to the right!
+    if (this.x > width) { //loop to the left!
+      this.x = -this.w;
+    }
+    rect(this.x, this.y, this.w, this.h);
+  }
+}
+
+function circleObj(dia) {
+  this.dia = dia;
+  this.color = color("#1A53FF")
+  this.disp = function(x, y) {
+    this.x = x;
+    this.y = y;
+    noStroke();
+    fill(this.color);
+    push();
+    ellipseMode(RADIUS);
+    pop();
+    ellipse(this.x, this.y, this.dia, this.dia);
+    push();
+    translate(12, 25);
+    // Making the turtle
+    //Legs
+    fill("#264D00")
+    circle(x, y, 10) //410 296
+    circle(x + 5, y - 41, 10)
+    circle(x - 25, y, 10)
+    circle(x - 30, y - 41, 10)
+    //head
+    fill('#4D9900')
+    circle(x - 12, y - 56, 15)
+    //eyes
+    fill('black')
+    circle(x - 16, y - 59, 3)
+    circle(x - 9, y - 59, 3)
+    //Body
+    fill('#336600')
+    ellipse(x - 12, y - 24, 40, 50)
+    fill('#4D9900')
+    ellipse(x - 12, y - 24, 25, 35)
+    pop();
+  }
+  
+
+}
